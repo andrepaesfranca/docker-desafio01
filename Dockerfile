@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine
+FROM golang:1.16 AS builder
 
 WORKDIR /go/src/app
 
@@ -8,4 +8,9 @@ RUN go mod init
 RUN go get -v -d
 RUN go install -v
 
-CMD ["app"]
+RUN go build -o /go/bin/docker
+
+FROM scratch
+
+COPY --from=builder /go/bin/docker /go/bin/alpine
+ENTRYPOINT ["/go/bin/alpine"]
